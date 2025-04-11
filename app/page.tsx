@@ -11,8 +11,9 @@ export default function Home() {
     <main className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 py-8">
         <header className="mb-12 text-center">
+          <h1 className="mb-10"></h1>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter mb-2">ICE WORKOUT</h1>
-          <p className="text-gray-400 text-lg">Ice Fan Oei</p>
+          <p className="text-gray-400 text-lg">-----------------------------------------------------------------</p>
         </header>
 
         <Tabs defaultValue="schedule" className="w-full">
@@ -36,6 +37,10 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </div>
+        <footer className="text-center text-gray-500 text-sm mb-4">
+              <p>Made with Ice❤️ for Ice only </p>
+              <p className="mt-1">© {new Date().getFullYear()} Ice</p>
+        </footer>
     </main>
   )
 }
