@@ -13,7 +13,7 @@ export default function Home() {
         <header className="mb-12 text-center">
           <h1 className="mb-10"></h1>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter mb-2">ICE WORKOUT</h1>
-          <p className="text-gray-400 text-lg">-----------------------------------------------------------------</p>
+          <p className="text-gray-400 text-lg"></p>
         </header>
 
         <Tabs defaultValue="schedule" className="w-full">
@@ -37,10 +37,6 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </div>
-        <footer className="text-center text-gray-500 text-sm mb-4">
-              <p>Made with Ice❤️ for Ice only </p>
-              <p className="mt-1">© {new Date().getFullYear()} Ice</p>
-        </footer>
     </main>
   )
 }

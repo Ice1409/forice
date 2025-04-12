@@ -70,7 +70,7 @@ export default function WorkoutSchedule({ workoutData }: WorkoutScheduleProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: dayIndex * 0.05 }}
                 >
-                  <DailyWorkout day={day} />
+                  <DailyWorkout day={day} weekNumber={index + 1} />
                 </motion.div>
               ))}
             </div>
