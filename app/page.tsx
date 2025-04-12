@@ -219,7 +219,7 @@ export default function Home() {
           </div>
 
           <div className="w-full space-y-3">
-            <Link href="/relationship-book1" className="block">
+            <Link href="/ice2" className="block">
               <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-blue-500">
                 <div className="flex items-center">
                   <Dumbbell className="h-5 w-5 text-blue-400 mr-3" />
@@ -234,7 +234,7 @@ export default function Home() {
               </div>
             </Link>
 
-            <Link href="/gallery1" className="block">
+            <Link href="/ice1" className="block">
               <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-green-500">
                 <div className="flex items-center">
                   <CheckSquare className="h-5 w-5 text-green-400 mr-3" />
