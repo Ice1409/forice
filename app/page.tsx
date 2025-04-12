@@ -2,6 +2,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import {
+  Heart,
   Dumbbell,
   CheckSquare,
   User,
@@ -284,20 +285,20 @@ export default function Home() {
           </div>
 
           <div className="w-full space-y-3">
-            {/* <Link href="/study-planner" className="block">
-              <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-yellow-500">
+            <Link href="https://foroei.netlify.app/" className="block">
+              <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-pink-500">
                 <div className="flex items-center">
-                  <GraduationCap className="h-5 w-5 text-yellow-400 mr-3" />
+                  <Heart className="h-5 w-5 text-pink-400 mr-3" />
                   <div>
-                    <div className="font-medium text-white">ตารางเรียน</div>
-                    <div className="text-xs text-zinc-400">ภาคเรียนที่ 1/2568</div>
+                    <div className="font-medium text-white">FOR OEI WEBSITE</div>
+                    <div className="text-xs text-zinc-400">เว็ปสำหรับเอยยย</div>
                   </div>
                 </div>
                 <div className="bg-zinc-700 rounded-full p-1">
-                  <Code className="h-4 w-4 text-yellow-400" />
+                  <Code className="h-4 w-4 text-pink-400" />
                 </div>
               </div>
-            </Link> */}
+            </Link>
           </div>
 
           <div className="text-center text-zinc-500 text-xs mt-4">FOR OEI • 2025</div>
