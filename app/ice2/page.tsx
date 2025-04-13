@@ -36,6 +36,7 @@ export default function Home() {
             <ExerciseGuide />
           </TabsContent>
         </Tabs>
+          <div className="text-center text-zinc-500 text-xs mt-4">FOR OEI • 2025</div>
       </div>
     </main>
   )

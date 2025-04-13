@@ -1,24 +1,18 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import {
-  Heart,
-  Dumbbell,
-  CheckSquare,
-  User,
-  Settings,
-  Music,
-  Code,
-  Lock,
-  AlertCircle,
-  Coffee,
-  GraduationCap,
-  GamepadIcon as GameController,
-} from "lucide-react"
+import { Heart, Dumbbell, CheckSquare, User, LogOut, Code, Lock, AlertCircle } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function Home() {
-  const [numberCode, setNumberCode] = useState("")
-  const [letterCode, setLetterCode] = useState("")
+  // For the 4-digit code
+  const [digitCodes, setDigitCodes] = useState(["", "", "", ""])
+  const digitRefs = [useRef(null), useRef(null), useRef(null), useRef(null)]
+
+  // For the 2-letter code
+  const [letterCodes, setLetterCodes] = useState(["", ""])
+  const letterRefs = [useRef(null), useRef(null)]
+
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
   const [opacity, setOpacity] = useState(1)
@@ -32,17 +26,120 @@ export default function Home() {
     oei: { number: "2202", letter: "OI" },
   }
 
-  const handleNumberChange = (e) => {
-    const value = e.target.value
-    if (value.length <= 4 && /^\d*$/.test(value)) {
-      setNumberCode(value)
+  // Check if user is already authenticated
+  useEffect(() => {
+    const savedAuth = localStorage.getItem("authState")
+    if (savedAuth) {
+      const { isAuth, user } = JSON.parse(savedAuth)
+      if (isAuth) {
+        setIsAuthenticated(true)
+        setActiveUser(user)
+      }
+    }
+  }, [])
+
+  // Handle digit input changes
+  const handleDigitChange = (index, value) => {
+    if (value.length > 1 || !/^\d*$/.test(value)) return
+
+    const newDigits = [...digitCodes]
+    newDigits[index] = value
+    setDigitCodes(newDigits)
+
+    // Auto-focus to next input
+    if (value !== "" && index < 3) {
+      digitRefs[index + 1].current.focus()
+    } else if (value !== "" && index === 3) {
+      // Move to letter inputs when all digits are filled
+      letterRefs[0].current.focus()
+    }
+    
+    // Check if this completes all inputs and try to submit
+    if (value !== "" && index === 3) {
+      const allDigitsFilled = newDigits.every(d => d !== "")
+      if (allDigitsFilled) {
+        checkForAutoSubmit(newDigits, letterCodes)
+      }
     }
   }
 
-  const handleLetterChange = (e) => {
-    const value = e.target.value
-    if (value.length <= 2 && /^[a-zA-Z]*$/.test(value)) {
-      setLetterCode(value.toUpperCase())
+  // Handle letter input changes
+  const handleLetterChange = (index, value) => {
+    if (value.length > 1 || !/^[a-zA-Z]*$/.test(value)) return
+
+    const newLetters = [...letterCodes]
+    newLetters[index] = value.toUpperCase()
+    setLetterCodes(newLetters)
+
+    // Auto-focus to next input
+    if (value !== "" && index < 1) {
+      letterRefs[index + 1].current.focus()
+    }
+    
+    // Check if this was the last input and try to submit
+    if (index === 1 && value !== "") {
+      const allLettersFilled = [...newLetters.slice(0, index), value].every(l => l !== "")
+      if (allLettersFilled) {
+        checkForAutoSubmit(digitCodes, [...newLetters.slice(0, index), value.toUpperCase()])
+      }
+    }
+  }
+
+  // Check if all inputs are filled and try to submit automatically
+  const checkForAutoSubmit = (digits, letters) => {
+    const allDigitsFilled = digits.every(d => d !== "")
+    const allLettersFilled = letters.every(l => l !== "")
+    
+    if (allDigitsFilled && allLettersFilled) {
+      validateAndSubmit(digits, letters)
+    }
+  }
+  
+  // Validate the codes and submit
+  const validateAndSubmit = (digits, letters) => {
+    const numberCode = digits.join("")
+    const letterCode = letters.join("")
+
+    // Check for Ice
+    if (numberCode === correctCodes.ice.number && letterCode === correctCodes.ice.letter) {
+      setActiveUser("ice")
+      setIsAuthenticated(true)
+      setShowWelcome(true)
+      // Save authentication state
+      localStorage.setItem("authState", JSON.stringify({ isAuth: true, user: "ice" }))
+      startWelcomeAnimation()
+      return
+    }
+
+    // Check for Oei
+    if (numberCode === correctCodes.oei.number && letterCode === correctCodes.oei.letter) {
+      setActiveUser("oei")
+      setIsAuthenticated(true)
+      setShowWelcome(true)
+      // Save authentication state
+      localStorage.setItem("authState", JSON.stringify({ isAuth: true, user: "oei" }))
+      startWelcomeAnimation()
+      return
+    }
+
+    // If neither code matches
+    showErrorAnimation("รหัสไม่ถูกต้อง")
+    setDigitCodes(["", "", "", ""])
+    setLetterCodes(["", ""])
+    digitRefs[0].current.focus()
+  }
+
+  // Handle backspace key
+  const handleKeyDown = (e, type, index) => {
+    if (e.key === "Backspace" && e.target.value === "") {
+      e.preventDefault()
+      if (type === "digit" && index > 0) {
+        digitRefs[index - 1].current.focus()
+      } else if (type === "letter" && index === 0) {
+        digitRefs[3].current.focus()
+      } else if (type === "letter" && index > 0) {
+        letterRefs[index - 1].current.focus()
+      }
     }
   }
 
@@ -67,33 +164,6 @@ export default function Home() {
     }, 1500)
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-
-    // Check for Ice
-    if (numberCode === correctCodes.ice.number && letterCode === correctCodes.ice.letter) {
-      setActiveUser("ice")
-      setIsAuthenticated(true)
-      setShowWelcome(true)
-      startWelcomeAnimation()
-      return
-    }
-
-    // Check for Oei
-    if (numberCode === correctCodes.oei.number && letterCode === correctCodes.oei.letter) {
-      setActiveUser("oei")
-      setIsAuthenticated(true)
-      setShowWelcome(true)
-      startWelcomeAnimation()
-      return
-    }
-
-    // If neither code matches
-    showErrorAnimation("รหัสไม่ถูกต้อง")
-    setNumberCode("")
-    setLetterCode("")
-  }
-
   const startWelcomeAnimation = () => {
     // Start fading out after 1 second
     setTimeout(() => {
@@ -108,6 +178,14 @@ export default function Home() {
         })
       }, 50)
     }, 1000)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("authState")
+    setIsAuthenticated(false)
+    setActiveUser("")
+    setDigitCodes(["", "", "", ""])
+    setLetterCodes(["", ""])
   }
 
   // Login screen
@@ -129,7 +207,7 @@ export default function Home() {
         <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center gap-6">
           <div className="text-center mb-2">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-1 font-mono tracking-tight mb-4">LOGIN</h1>
-            <p className="text-zinc-400 uppercase tracking-widest text-sm">รหัสลับระหว่างเรา</p>
+            <p className="text-zinc-400 uppercase tracking-widest text-sm">รหัสลับ</p>
           </div>
 
           <div className="bg-zinc-800 rounded-xl shadow-lg p-8 w-full border border-zinc-700">
@@ -137,42 +215,50 @@ export default function Home() {
               <Lock className="h-8 w-8 text-zinc-400" />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-5">
               <div className="space-y-2">
-                <label className="block text-zinc-400 text-sm font-medium">PASSCODE</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={numberCode}
-                    onChange={handleNumberChange}
-                    placeholder="1234"
-                    className="bg-zinc-900 text-white p-3 rounded flex-1 border border-zinc-700 focus:outline-none focus:border-blue-500 text-center font-mono"
-                    maxLength={4}
-                    autoFocus
-                  />
-                  <span className="text-zinc-400 text-xl">-</span>
-                  <input
-                    type="text"
-                    value={letterCode}
-                    onChange={handleLetterChange}
-                    placeholder="AB"
-                    className="bg-zinc-900 text-white p-3 rounded w-20 border border-zinc-700 focus:outline-none focus:border-blue-500 text-center font-mono"
-                    maxLength={2}
-                  />
+                <label className="block text-zinc-400 text-sm font-medium mb-4">PASSCODE</label>
+                <div className="flex justify-center space-x-2">
+                  {/* All inputs in a single row */}
+                  {digitCodes.map((digit, index) => (
+                    <input
+                      key={`digit-${index}`}
+                      ref={digitRefs[index]}
+                      type="text"
+                      value={digit}
+                      onChange={(e) => handleDigitChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, "digit", index)}
+                      className="bg-zinc-900 text-white p-3 rounded w-12 h-12 border border-zinc-700 focus:outline-none focus:border-blue-500 text-center font-mono text-xl"
+                      maxLength={1}
+                      autoFocus={index === 0}
+                    />
+                  ))}
+                  
+                  {/* Separator line */}
+                  <div className="flex items-center">
+                    <div className="w-4 h-0.5 bg-zinc-700 mx-1"></div>
+                  </div>
+                  
+                  {/* Letter inputs */}
+                  {letterCodes.map((letter, index) => (
+                    <input
+                      key={`letter-${index}`}
+                      ref={letterRefs[index]}
+                      type="text"
+                      value={letter}
+                      onChange={(e) => handleLetterChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, "letter", index)}
+                      className="bg-zinc-900 text-white p-3 rounded w-12 h-12 border border-zinc-700 focus:outline-none focus:border-blue-500 text-center font-mono text-xl uppercase mb-4"
+                      maxLength={1}
+                    />
+                  ))}
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">รูปแบบ: 1234 - AB</p>
+                <p className="text-xs text-zinc-500 mt-3 text-center">รูปแบบ เช่น: 1234 - AB (เดากันไม่ถูกหรอก)</p>
               </div>
-
-              <button
-                type="submit"
-                className="w-full bg-zinc-700 hover:bg-zinc-600 text-white py-3 px-4 rounded font-medium transition-colors"
-              >
-                เข้าสู่ระบบ
-              </button>
-            </form>
+            </div>
           </div>
 
-          <div className="text-center text-zinc-500 text-xs mt-4">FOR ICE ONLY</div>
+          <div className="text-center text-zinc-500 text-xs mt-4">@ {new Date().getFullYear()} • From ICE</div>
         </div>
       </main>
     )
@@ -198,7 +284,9 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-zinc-900">
         <div className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-6">
           <div className="text-center mb-2">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-1 font-mono tracking-tight mb-4">ICE WEBSITE</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-1 font-mono tracking-tight mb-4">
+              ICE WEBSITE
+            </h1>
             <p className="text-zinc-400 uppercase tracking-widest text-sm">FOR ICE ONLY</p>
           </div>
 
@@ -208,7 +296,13 @@ export default function Home() {
                 <User className="h-6 w-6 text-white mr-2" />
                 <span className="text-white font-medium">ICE</span>
               </div>
-              <Settings className="h-5 w-5 text-zinc-400" />
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded-md text-sm transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </div>
 
             <div className="h-1 w-full bg-gradient-to-r from-zinc-700 to-zinc-600 rounded-full mb-4"></div>
@@ -221,7 +315,11 @@ export default function Home() {
 
           <div className="w-full space-y-3">
             <Link href="/ice2" className="block">
-              <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-blue-500">
+              <motion.div
+                className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-blue-500"
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <div className="flex items-center">
                   <Dumbbell className="h-5 w-5 text-blue-400 mr-3" />
                   <div>
@@ -232,11 +330,15 @@ export default function Home() {
                 <div className="bg-zinc-700 rounded-full p-1">
                   <Code className="h-4 w-4 text-blue-400" />
                 </div>
-              </div>
+              </motion.div>
             </Link>
 
             <Link href="/ice1" className="block">
-              <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-green-500">
+              <motion.div
+                className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-green-500"
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <div className="flex items-center">
                   <CheckSquare className="h-5 w-5 text-green-400 mr-3" />
                   <div>
@@ -247,11 +349,11 @@ export default function Home() {
                 <div className="bg-zinc-700 rounded-full p-1">
                   <Code className="h-4 w-4 text-green-400" />
                 </div>
-              </div>
+              </motion.div>
             </Link>
           </div>
 
-          <div className="text-center text-zinc-500 text-xs mt-4">FOR ICE • 2025</div>
+          <div className="text-center text-zinc-500 text-xs mt-4">FOR ICE • {new Date().getFullYear()}</div>
         </div>
       </main>
     )
@@ -273,7 +375,13 @@ export default function Home() {
                 <User className="h-6 w-6 text-white mr-2" />
                 <span className="text-white font-medium">OEI</span>
               </div>
-              <Settings className="h-5 w-5 text-zinc-400" />
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded-md text-sm transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </div>
 
             <div className="h-1 w-full bg-gradient-to-r from-zinc-700 to-zinc-600 rounded-full mb-4"></div>
@@ -286,7 +394,11 @@ export default function Home() {
 
           <div className="w-full space-y-3">
             <Link href="https://foroei.netlify.app/" className="block">
-              <div className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-pink-500">
+              <motion.div
+                className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-pink-500"
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <div className="flex items-center">
                   <Heart className="h-5 w-5 text-pink-400 mr-3" />
                   <div>
@@ -297,11 +409,11 @@ export default function Home() {
                 <div className="bg-zinc-700 rounded-full p-1">
                   <Code className="h-4 w-4 text-pink-400" />
                 </div>
-              </div>
+              </motion.div>
             </Link>
           </div>
 
-          <div className="text-center text-zinc-500 text-xs mt-4">FOR OEI • 2025</div>
+          <div className="text-center text-zinc-500 text-xs mt-4">FOR OEI • {new Date().getFullYear()}</div>
         </div>
       </main>
     )

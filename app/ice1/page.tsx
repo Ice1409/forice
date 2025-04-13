@@ -156,6 +156,7 @@ export default function Home() {
               <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
             </div>
           </div>
+          
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <p className="text-sm md:text-base text-gray-400">สำหรับ ม.4 โครงการวมว. มช.</p>
@@ -240,6 +241,7 @@ export default function Home() {
               <span>บันทึกแล้ว</span>
             </div>
           </div>
+          <div className="text-center text-zinc-500 text-xs mt-4">FOR ICE • {new Date().getFullYear()}</div>
         </footer>
       </div>
     </div>
