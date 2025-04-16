@@ -40,7 +40,7 @@ export default function WorkoutSchedule({ workoutData }: WorkoutScheduleProps) {
       </div>
 
       <Tabs defaultValue="1" value={activeWeek} onValueChange={setActiveWeek} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-5 mb-8">
           {workoutData.map((week, index) => (
             <TabsTrigger
               key={index}
