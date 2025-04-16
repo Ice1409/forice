@@ -314,7 +314,7 @@ export default function Home() {
           </div>
 
           <div className="w-full space-y-3">
-            <Link href="/ice2" className="block">
+            <Link href="/ICEWORKOUT1714" className="block">
               <motion.div
                 className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-blue-500"
                 whileHover={{ x: 5 }}
@@ -333,7 +333,7 @@ export default function Home() {
               </motion.div>
             </Link>
 
-            <Link href="/ice1" className="block">
+            <Link href="/DORMITORYCHECKLIST1217" className="block">
               <motion.div
                 className="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-xl p-4 text-left border-l-4 border-green-500"
                 whileHover={{ x: 5 }}
